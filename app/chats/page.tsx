@@ -42,12 +42,12 @@ const Page = () => {
         className='hidden fixed inset-0 z-50 bg-black/50 overflow-y-auto p-4'
       >
         <div className='relative min-h-full w-1/3 flex items-center justify-center'>
-          <div className='relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-2xl lg:max-w-4xl'>
-            <div className='flex items-center justify-between p-4 border-b border-neutral-600'>
+          <div className='relative bg-white dark:bg-neutral-900 rounded-lg shadow-xl w-full max-w-2xl lg:max-w-4xl'>
+            <div className='flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-600'>
               <h3 className='text-xl font-semibold text-neutral-900 dark:text-white'>New Chat</h3>
               <button
                 type='button'
-                className='end-2.5 text-neutral-400 bg-transparent hover:bg-neutral-200 hover:text-neutral-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-neutral-600 dark:hover:text-white'
+                className='end-2.5 text-neutral-500 bg-transparent hover:bg-neutral-200 hover:text-neutral-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-white'
                 data-modal-hide='new-chat-modal'
               >
                 <i className='fa-solid fa-xmark'></i>
