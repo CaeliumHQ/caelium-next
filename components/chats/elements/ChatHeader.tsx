@@ -1,4 +1,3 @@
-import { useContext, useEffect, useRef, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +13,8 @@ import AuthContext from '@/contexts/AuthContext';
 import ChatContext from '@/contexts/ChatContext';
 import { NavLink } from '@/helpers/props';
 import Link from 'next/link';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { FaArrowLeft, FaEllipsisV, FaPhone, FaVideo } from 'react-icons/fa';
 
 const ChatHeader = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -49,7 +50,7 @@ const ChatHeader = () => {
     <>
       <div ref={headerRef} className='flex sticky top-0 z-10 flex-row h-16 bg-neutral-300 dark:bg-neutral-900 dark:text-white'>
         <Link className='flex flex-col my-auto self-start p-3 h-min justify-center rounded-full' href='/chats'>
-          <i className='fa-solid fa-arrow-left'></i>
+          <FaArrowLeft />
         </Link>
         <div className='flex items-center'>
           {!meta?.is_group ? (
@@ -101,9 +102,15 @@ const ChatHeader = () => {
           </Link>
         </div>
         <div className='flex items-center flex-grow justify-end'>
+          <button className='p-3 me-4'>
+            <FaVideo className='text-xl' />
+          </button>
+          <button className='p-3 me-4'>
+            <FaPhone className='text-xl rotate-90' />
+          </button>
           <DropdownMenu>
             <DropdownMenuTrigger className='outline-none'>
-              <i className='fa-solid fa-ellipsis-vertical p-3 me-4'></i>
+              <i className='fa-solid text-xl fa-ellipsis-vertical p-3 me-4'></i>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {options.map((option: NavLink, id) => (

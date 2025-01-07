@@ -60,7 +60,7 @@ const ChatProfile = () => {
           </button>
           <button className='flex flex-col items-center'>
             <div className='p-3 bg-neutral-800 rounded-full mb-1'>
-              <FaPhone className='text-xl text-blue-500' />
+              <FaPhone className='text-xl text-blue-500 rotate-90' />
             </div>
             <span className='text-sm'>Call</span>
           </button>
