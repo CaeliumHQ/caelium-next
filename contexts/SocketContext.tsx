@@ -16,24 +16,29 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [socketData, setSocketData] = useState<any>();
   const [isConnected, setIsConnected] = useState(false);
   const retryCountRef = useRef(0);
+  const mounted = useRef(false);
 
   useEffect(() => {
     if (!socketData) return;
-    console.log('Socket data:', socketData);
-    if (socketData.category === 'online_users') {
-      setActiveUsers(socketData.online_users);
-    } else if (socketData.category === 'status_update') {
-      socketData.is_online ? addActiveUser(socketData.user_id) : removeActiveUser(socketData.user_id);
-      updateLastSeen(socketData.user_id);
+    try {
+      if (socketData.category === 'online_users') {
+        setActiveUsers(socketData.online_users);
+      } else if (socketData.category === 'status_update') {
+        socketData.is_online ? addActiveUser(socketData.user_id) : removeActiveUser(socketData.user_id);
+        updateLastSeen(socketData.user_id);
+      }
+    } catch (error) {
+      console.error('Error processing socket data:', error);
     }
-  }, [socketData]);
+  }, [socketData, setActiveUsers, addActiveUser, removeActiveUser, updateLastSeen]);
 
   useEffect(() => {
+    mounted.current = true;
     const token = localStorage.getItem('authTokens');
     if (!token) return;
 
     let reconnectTimeout: NodeJS.Timeout;
-    let reconnectInterval = 5000; // Reconnect every 5 seconds
+    const reconnectInterval = 500;
 
     const connectWebSocket = () => {
       console.log('Connecting to WebSocket');
@@ -52,8 +57,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       };
 
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        setSocketData(data);
+        try {
+          const data = JSON.parse(event.data);
+          if (mounted.current) {
+            setSocketData(data);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
       };
 
       ws.onclose = () => {
@@ -80,6 +91,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     connectWebSocket();
 
     return () => {
+      mounted.current = false;
       if (socketRef.current) {
         socketRef.current.onclose = null; // Prevent reconnect on component unmount
         socketRef.current.close();
