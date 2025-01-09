@@ -30,7 +30,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (error) {
       console.error('Error processing socket data:', error);
     }
-  }, [socketData, setActiveUsers, addActiveUser, removeActiveUser, updateLastSeen]);
+  }, [socketData]);
 
   useEffect(() => {
     mounted.current = true;
