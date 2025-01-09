@@ -14,7 +14,7 @@ import ChatContext from '@/contexts/ChatContext';
 import { NavLink } from '@/helpers/props';
 import Link from 'next/link';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { FaArrowLeft, FaEllipsisV, FaPhone, FaVideo } from 'react-icons/fa';
+import { FaArrowLeft, FaPhone, FaVideo } from 'react-icons/fa';
 
 const ChatHeader = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
