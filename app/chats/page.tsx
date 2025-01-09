@@ -6,6 +6,7 @@ import { Comforter } from 'next/font/google';
 import Link from 'next/link';
 import Wrapper from '../Wrapper';
 import { handleeFont } from '../font';
+import { RiChatNewLine } from 'react-icons/ri';
 
 const comforter = Comforter({ weight: '400', subsets: ['cyrillic'] });
 
@@ -70,7 +71,7 @@ const Page = () => {
           href={'/chats/new-chat'}
           className='flex items-center justify-center text-white bg-neutral-500 rounded-lg w-14 h-14 hover:bg-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 focus:ring-4 focus:ring-neutral-300 focus:outline-none dark:focus:ring-neutral-800'
         >
-          <span className='material-symbols-outlined'>add_circle</span>
+          <RiChatNewLine className='text-xl' />
         </Link>
       </div>
     </Wrapper>
