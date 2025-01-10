@@ -102,23 +102,26 @@ const ChatHeader = () => {
           </Link>
         </div>
         <div className='flex items-center flex-grow justify-end'>
-          <button className='p-3 me-4'>
-            <FaVideo
-              onClick={() => {
-                startCall('video');
-              }}
-              className='text-xl'
-            />
-          </button>
-          <button className='p-3 me-4'>
-            <FaPhone
-            
-              onClick={() => {
-                startCall('audio');
-              }}
-              className='text-xl rotate-90'
-            />
-          </button>
+          {!meta?.is_group && (
+            <>
+              <button className='p-3 me-4'>
+                <FaVideo
+                  onClick={() => {
+                    startCall('video');
+                  }}
+                  className='text-xl'
+                />
+              </button>
+              <button className='p-3 me-4'>
+                <FaPhone
+                  onClick={() => {
+                    startCall('audio');
+                  }}
+                  className='text-xl rotate-90'
+                />
+              </button>
+            </>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger className='outline-none'>
               <i className='fa-solid text-xl fa-ellipsis-vertical p-3 me-4'></i>
