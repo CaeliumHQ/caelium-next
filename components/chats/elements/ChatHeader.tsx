@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AuthContext from '@/contexts/AuthContext';
-import ChatContext from '@/contexts/ChatContext';
+import { useChatContext } from '@/contexts/ChatContext';
 import { NavLink } from '@/helpers/props';
 import Link from 'next/link';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -19,7 +19,7 @@ import { FaArrowLeft, FaPhone, FaVideo } from 'react-icons/fa';
 const ChatHeader = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
-  let { getParticipant, clearChat, meta, getLastSeen } = useContext(ChatContext);
+  let { getParticipant, clearChat, meta, getLastSeen, startCall } = useChatContext();
   let { user } = useContext(AuthContext);
 
   const options: NavLink[] = [
@@ -103,10 +103,21 @@ const ChatHeader = () => {
         </div>
         <div className='flex items-center flex-grow justify-end'>
           <button className='p-3 me-4'>
-            <FaVideo className='text-xl' />
+            <FaVideo
+              onClick={() => {
+                startCall('video');
+              }}
+              className='text-xl'
+            />
           </button>
           <button className='p-3 me-4'>
-            <FaPhone className='text-xl rotate-90' />
+            <FaPhone
+            
+              onClick={() => {
+                startCall('audio');
+              }}
+              className='text-xl rotate-90'
+            />
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger className='outline-none'>

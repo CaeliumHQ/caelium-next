@@ -2,13 +2,13 @@
 import { Button } from '@/components/ui/button';
 import { BaseError, Chat, Message, User } from '@/helpers/props';
 import useAxios from '@/hooks/useAxios';
+import { formatTimeSince } from '@/utils/timeUtils';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import AuthContext from './AuthContext';
 import { useChatsPaneContext } from './ChatsPaneContext';
 import { useWebSocket } from './SocketContext';
-import { formatTimeSince } from '@/utils/timeUtils';
 
 interface childrenProps {
   chatId: number;
@@ -32,6 +32,7 @@ interface ChatContextProps {
   meta: Chat | null;
   getParticipant: (id: number) => User | null;
   getLastSeen: (participantId: number) => ReactNode;
+  startCall: (type: 'audio' | 'video') => void;
 }
 
 const ChatContext = createContext<ChatContextProps>({
@@ -51,6 +52,7 @@ const ChatContext = createContext<ChatContextProps>({
   meta: null,
   getParticipant: () => null,
   getLastSeen: () => null,
+  startCall: async () => {},
 });
 export default ChatContext;
 
@@ -65,8 +67,7 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [typingMessage, setTypingMessage] = useState<{ typed: string; sender: number } | null>(null);
   const [nextPage, setNextPage] = useState<string | null>(null);
-  const [isSocketReady, setIsSocketReady] = useState(false);
-  const [messageQueue, setMessageQueue] = useState<{type: 'txt' | 'attachment'; content?: string}[]>([]);
+  const [messageQueue, setMessageQueue] = useState<{ type: 'txt' | 'attachment'; content?: string }[]>([]);
 
   const api = useAxios();
   const router = useRouter();
@@ -110,17 +111,13 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
   }, [chatId, user]);
 
   useEffect(() => {
-    if (socket?.readyState === WebSocket.OPEN) {
-      setIsSocketReady(true);
-      // Process any queued messages
-      messageQueue.forEach(msg => {
+    if (socket?.readyState === WebSocket.OPEN && messageQueue.length > 0) {
+      messageQueue.forEach((msg) => {
         sendMessage(msg.type, msg.content);
       });
       setMessageQueue([]);
-    } else {
-      setIsSocketReady(false);
     }
-  }, [socket?.readyState]);
+  }, [socket?.readyState, messageQueue]);
 
   const loadMoreMessages = async () => {
     if (!nextPage || isLoadingMore) return; // Prevent fetching if already at the last page or currently loading
@@ -142,19 +139,21 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
     if (type === 'txt') {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         console.warn('Socket not ready, queueing message');
-        setMessageQueue(prev => [...prev, {type, content}]);
+        setMessageQueue((prev) => [...prev, { type, content }]);
         return;
       }
 
       try {
         if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ 
-            category: 'text_message', 
-            message: content, 
-            type, 
-            chat_id: chatId 
-          }));
-          
+          socket.send(
+            JSON.stringify({
+              category: 'text_message',
+              message: content,
+              type,
+              chat_id: chatId,
+            }),
+          );
+
           setMessages((prevMessages) => [
             ...prevMessages,
             {
@@ -171,7 +170,7 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
         }
       } catch (error) {
         console.error('Failed to send message:', error);
-        setMessageQueue(prev => [...prev, {type, content}]);
+        setMessageQueue((prev) => [...prev, { type, content }]);
       }
     } else {
       setIsUploading(true);
@@ -191,10 +190,39 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
     }
   };
 
+  const startCall = async (type: 'audio' | 'video') => {
+    try {
+      const response = await api.post(`/api/chats/${chatId}/start_call/`, {
+        chat_id: chatId,
+        call_type: type
+      });
+      
+      if (response.data?.id) {
+        router.push(`/call/${response.data.id}`);
+      } else {
+        setError({
+          text: 'Failed to create call session',
+          code: 'CREATION_FAILED',
+        });
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError({
+          text: error.response?.data?.detail || 'Failed to start call',
+          code: 'FETCH_FAILED',
+        });
+      } else {
+        setError({
+          text: 'An unexpected error occurred while starting the call',
+          code: 'FETCH_FAILED',
+        });
+      }
+    }
+  };
+
   const getParticipant = (id: number) => {
     return meta?.participants?.find((participant) => participant.id == id) || null;
   };
-
 
   const getLastSeen = (participantId: number) => {
     const lastSeenUser = lastSeenUsers.find((user) => user.userId === participantId);
@@ -210,7 +238,6 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
       );
     }
   };
-
 
   const handleTyping = async (text: string) => {
     if (socket?.readyState === WebSocket.OPEN) {
@@ -280,7 +307,8 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
         nextPage,
         meta,
         getParticipant,
-        getLastSeen
+        getLastSeen,
+        startCall,
       }}
     >
       {children}

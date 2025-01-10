@@ -55,7 +55,7 @@ export interface Craft {
 
 export interface BaseError {
   text: string;
-  code: 'CHAT_NOT_FOUND' | 'FETCH_FAILED' | 'DELETE_FAILED';
+  code: 'ITEM_NOT_FOUND' | 'FETCH_FAILED' | 'DELETE_FAILED' | 'CREATION_FAILED';
 }
 
 export interface NavLink {
