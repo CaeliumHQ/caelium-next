@@ -13,7 +13,7 @@ import AuthContext from '@/contexts/AuthContext';
 import { useChatContext } from '@/contexts/ChatContext';
 import { NavLink } from '@/helpers/props';
 import Link from 'next/link';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { FaArrowLeft, FaPhone, FaVideo } from 'react-icons/fa';
 
 const ChatHeader = () => {
@@ -31,20 +31,6 @@ const ChatHeader = () => {
     clearChat();
     setIsAlertOpen(false);
   };
-
-  const preventDefault = (e: TouchEvent) => {
-    e.preventDefault();
-  };
-
-  useEffect(() => {
-    const headerElement = headerRef.current;
-    if (headerElement) {
-      headerElement.addEventListener('touchmove', preventDefault, { passive: false });
-      return () => {
-        headerElement.removeEventListener('touchmove', preventDefault);
-      };
-    }
-  }, []);
 
   return (
     <>
