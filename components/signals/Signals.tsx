@@ -9,9 +9,10 @@ const Signals = () => {
         <IncomingCallAlert
           isOpen={incomingCall !== null}
           caller={{
-            name: 'Jerit Baiju',
-            image: 'http://192.168.43.73:8000/media/avatars/24UBC234ojBsCkQQG0dudLfZ.jpg',
-            callType: 'audio',
+            name: incomingCall.caller.name,
+            image: incomingCall.caller.avatar_url,
+            chat_id: incomingCall.chat_id,
+            callType: incomingCall.type,
           }}
         />
       )}

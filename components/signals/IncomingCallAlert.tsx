@@ -2,6 +2,7 @@
 
 import { AlertDialog, AlertDialogContent, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useServices } from '@/contexts/ServiceContext';
 import { PhoneIcon, UserCircle, VideoIcon } from 'lucide-react';
 import { FaPhoneSlash } from 'react-icons/fa';
 
@@ -10,11 +11,16 @@ interface IncomingCallAlertProps {
   caller: {
     name: string;
     image?: string;
+    chat_id: string;
     callType: 'video' | 'audio';
   };
 }
 
 export function IncomingCallAlert({ isOpen, caller }: IncomingCallAlertProps) {
+  const { clearIncomingCall } = useServices();
+  const acceptCall = () => {
+    window.location.href = `/chats/call/${caller.chat_id}?type=${caller.callType}`;
+  };
   return (
     <AlertDialog open={isOpen}>
       <AlertDialogContent
@@ -62,6 +68,7 @@ export function IncomingCallAlert({ isOpen, caller }: IncomingCallAlertProps) {
           {/* Actions */}
           <div className='flex items-center gap-6 pt-2'>
             <Button
+              onClick={clearIncomingCall}
               variant='outline'
               className='rounded-full w-14 h-14 border-2 border-red-500/20 bg-red-50 dark:bg-red-950/20
                 hover:bg-red-100 dark:hover:bg-red-950/30 hover:scale-105 transition-all duration-200'
@@ -69,6 +76,7 @@ export function IncomingCallAlert({ isOpen, caller }: IncomingCallAlertProps) {
               <FaPhoneSlash size={20} className='text-red-600 dark:text-red-500' />
             </Button>
             <Button
+              onClick={acceptCall}
               variant='default'
               className='rounded-full w-14 h-14 bg-emerald-600 hover:bg-emerald-700
                 dark:bg-emerald-700 dark:hover:bg-emerald-800

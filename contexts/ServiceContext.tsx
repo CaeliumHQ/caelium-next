@@ -1,13 +1,12 @@
-// context/NotificationContext.js
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { useWebSocket } from './SocketContext';
 
-interface NotificationContextType {
+interface ServiceContextType {
   incomingCall: any | null;
   clearIncomingCall: () => void;
 }
 
-const NotificationContext = createContext<NotificationContextType>({
+const ServiceContext = createContext<ServiceContextType>({
   incomingCall: null,
   clearIncomingCall: () => {},
 });
@@ -19,9 +18,8 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   const clearIncomingCall = () => setIncomingCall(null);
 
   useEffect(() => {
-    if (socketData.type === 'incoming_call') {
-      setIncomingCall(socketData.data);
-
+    if (socketData?.category === 'incoming_call') {
+      setIncomingCall(socketData);
       const timeoutId = setTimeout(() => {
         clearIncomingCall();
       }, 20000);
@@ -30,11 +28,11 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [socketData]);
 
-  return <NotificationContext.Provider value={{ incomingCall, clearIncomingCall }}>{children}</NotificationContext.Provider>;
+  return <ServiceContext.Provider value={{ incomingCall, clearIncomingCall }}>{children}</ServiceContext.Provider>;
 };
 
 export const useServices = () => {
-  const context = useContext(NotificationContext);
+  const context = useContext(ServiceContext);
   if (context === undefined) {
     throw new Error('useServices must be used within a ServiceProvider');
   }
