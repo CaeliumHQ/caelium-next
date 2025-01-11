@@ -2,6 +2,7 @@
 import BottomNav from '@/components/BottomNav';
 import NavBar from '@/components/NavBar';
 import SideBar from '@/components/SideBar';
+import Signals from '@/components/signals/Signals';
 import { initFlowbite } from 'flowbite';
 import { ReactNode, useEffect } from 'react';
 
@@ -24,6 +25,7 @@ const Wrapper = ({ children, navSM = true }: WrapperProps) => {
       <div className={navSM ? 'max-lg:mt-16' : 'max-lg:hidden'}>
         <BottomNav />
       </div>
+      <Signals />
     </main>
   );
 };
