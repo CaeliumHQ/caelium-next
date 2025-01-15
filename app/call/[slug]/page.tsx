@@ -1,13 +1,11 @@
 'use client';
 import { ChatProvider } from '@/contexts/ChatContext';
-import { useChatsPaneContext } from '@/contexts/ChatsPaneContext';
 import { useNavbar } from '@/contexts/NavContext';
 import { use, useEffect } from 'react';
 
 const CallPage = (props: { params: Promise<{ slug: number }> }) => {
   const params = use(props.params);
   const { setShowNav } = useNavbar();
-  const {} = useChatsPaneContext();
   useEffect(() => {
     setShowNav(false);
   }, []);
