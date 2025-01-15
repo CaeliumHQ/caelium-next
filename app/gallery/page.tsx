@@ -6,7 +6,6 @@ import { getDate } from '@/helpers/support';
 import useAxios from '@/hooks/useAxios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Wrapper from '../Wrapper';
 
 const Page = () => {
   const api = useAxios();
@@ -62,38 +61,34 @@ const Page = () => {
   }
 
   return loading ? (
-    <Wrapper>
-      <div className='flex items-center justify-center h-[calc(100dvh-9rem)]'>
-        <Loader />
-      </div>
-    </Wrapper>
+    <div className='flex items-center justify-center h-[calc(100dvh-9rem)]'>
+      <Loader />
+    </div>
   ) : (
-    <Wrapper>
-      <div className='p-4'>
-        {havePermission ? (
-          Object.entries(groupedImages).map(([date, images_of_date]) => (
-            <div className='pb-4' key={date}>
-              <p className='text-3xl py-2'>{getDate(date)}</p>
-              <div className='grid grid-cols-1 max-sm:grid-cols-2 md:grid-cols-7 gap-4'>
-                {images_of_date.map((image: Image, i) => (
-                  <Link key={i} href={`/gallery/image/${image.id}`}>
-                    <img className='aspect-square rounded-lg object-cover' src={image.url} />
-                  </Link>
-                ))}
-              </div>
+    <div className='p-4'>
+      {havePermission ? (
+        Object.entries(groupedImages).map(([date, images_of_date]) => (
+          <div className='pb-4' key={date}>
+            <p className='text-3xl py-2'>{getDate(date)}</p>
+            <div className='grid grid-cols-1 max-sm:grid-cols-2 md:grid-cols-7 gap-4'>
+              {images_of_date.map((image: Image, i) => (
+                <Link key={i} href={`/gallery/image/${image.id}`}>
+                  <img className='aspect-square rounded-lg object-cover' src={image.url} />
+                </Link>
+              ))}
             </div>
-          ))
-        ) : (
-          <div className='flex flex-col items-center h-[calc(100dvh-9rem)] justify-center'>
-            <img className='h-28 mb-6' src={'/google/photos.png'} />
-            <p className='mb-4 text-lg text-center text-balance'>Tap the button below to import your photos from Google.</p>
-            <Link href={accessURL} className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'>
-              Sync Photos
-            </Link>
           </div>
-        )}
-      </div>
-    </Wrapper>
+        ))
+      ) : (
+        <div className='flex flex-col items-center h-[calc(100dvh-9rem)] justify-center'>
+          <img className='h-28 mb-6' src={'/google/photos.png'} />
+          <p className='mb-4 text-lg text-center text-balance'>Tap the button below to import your photos from Google.</p>
+          <Link href={accessURL} className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'>
+            Sync Photos
+          </Link>
+        </div>
+      )}
+    </div>
   );
 };
 

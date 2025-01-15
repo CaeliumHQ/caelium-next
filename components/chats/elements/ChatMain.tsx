@@ -1,7 +1,8 @@
 'use client';
 import ChatContext from '@/contexts/ChatContext';
 import { Message } from '@/helpers/props';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useContext, useEffect, useRef, useState } from 'react';
 import DocMessage from './ChatBubbles/DocMessage';
 import ImageMessage from './ChatBubbles/ImageMessage';
 import { Separator } from './ChatBubbles/Separator';
@@ -48,19 +49,30 @@ const ChatMain = ({ viewportHeight }: { viewportHeight?: number }) => {
   let prevDate: Date | null = null;
 
   const renderMessage = (message: Message) => {
-    if (message.type === 'txt') {
-      return <TextMessage key={message.id} message={message} />;
-    } else if (message.type === 'img') {
-      return <ImageMessage key={message.id} message={message} />;
-    } else if (message.type === 'vid') {
-      return <VideoMessage key={message.id} message={message} />;
-    } else if (message.type === 'aud') {
-      return <VoiceMessage key={message.id} message={message} />;
-    } else if (message.type === 'doc') {
-      return <DocMessage key={message.id} message={message} />;
-    } else {
-      return null;
-    }
+    const messageVariants = {
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, x: -10 }
+    };
+
+    const messageComponent = (
+      <motion.div
+        key={message.id}
+        variants={messageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.2 }}
+      >
+        {message.type === 'txt' && <TextMessage message={message} />}
+        {message.type === 'img' && <ImageMessage message={message} />}
+        {message.type === 'vid' && <VideoMessage message={message} />}
+        {message.type === 'aud' && <VoiceMessage message={message} />}
+        {message.type === 'doc' && <DocMessage message={message} />}
+      </motion.div>
+    );
+
+    return messageComponent;
   };
 
   useEffect(() => {
@@ -73,25 +85,46 @@ const ChatMain = ({ viewportHeight }: { viewportHeight?: number }) => {
   return (
     <div ref={containerRef} onScroll={handleScroll} className='flex flex-col overflow-auto h-full p-2'>
       <div className='flex-grow' />
-      {nextPage && <div className='text-center text-neutral-400 my-10'>Loading older messages...</div>}
+      {nextPage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className='text-center text-neutral-400 my-10'
+        >
+          Loading older messages...
+        </motion.div>
+      )}
       <div className='flex flex-col justify-end'>
-        {messages.length === 0 && <div className='text-center text-neutral-400'>No messages yet</div>}
-        {messages.map((message, index) => {
-          const currentDate = new Date(message.timestamp);
-          const isNewDay = !prevDate || !isSameDay(prevDate, currentDate);
-          prevDate = currentDate;
-          if (isNewDay) {
-            return (
-              <React.Fragment key={`separator-${index}`}>
-                <Separator timestamp={currentDate} />
-                {renderMessage(message)}
-              </React.Fragment>
-            );
-          }
-          return renderMessage(message);
-        })}
-        {isUploading && <UploadingMessage />}
-        {typingMessage && <Typing />}
+        <AnimatePresence mode="popLayout">
+          {messages.length === 0 && (
+            <motion.div
+              key="no-messages"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className='text-center text-neutral-400'
+            >
+              No messages yet
+            </motion.div>
+          )}
+          {messages.map((message, index) => {
+            const currentDate = new Date(message.timestamp);
+            const isNewDay = !prevDate || !isSameDay(prevDate, currentDate);
+            prevDate = currentDate;
+            
+            if (isNewDay) {
+              return (
+                <motion.div key={`day-${currentDate.toISOString()}`}>
+                  <Separator timestamp={currentDate} />
+                  {renderMessage(message)}
+                </motion.div>
+              );
+            }
+            return renderMessage(message);
+          })}
+          {isUploading && <UploadingMessage key="uploading" />}
+          {typingMessage && <Typing key="typing" />}
+        </AnimatePresence>
       </div>
     </div>
   );

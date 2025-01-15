@@ -4,8 +4,10 @@ import { useChatsPaneContext } from '@/contexts/ChatsPaneContext';
 import { useWebSocket } from '@/contexts/SocketContext';
 import { Chat } from '@/helpers/props';
 import { getTime, truncate } from '@/helpers/support';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useContext, useEffect } from 'react';
+import { FiSearch, FiX } from 'react-icons/fi';
 import Loader from '../Loader';
 
 const ChatsPane = () => {
@@ -31,114 +33,119 @@ const ChatsPane = () => {
   };
 
   return (
-    <div className='flex flex-col max-md:h-[calc(100dvh-10rem)] h-[calc(100dvh-5rem)] w-full flex-grow overflow-hidden'>
-      <div className='flex w-full sticky top-0 z-10 flex-col'>
-        <form onSubmit={searchChats} className='m-3'>
-          <label htmlFor='default-search' className='mb-2 text-sm font-medium text-neutral-900 sr-only dark:text-white'>
-            Search
-          </label>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className='flex flex-col max-md:h-[calc(100dvh-8rem)] h-[calc(100dvh-8rem)] w-full bg-white dark:bg-neutral-900 md:rounded-2xl shadow-sm'
+    >
+      {/* Search Header */}
+      <div className='sticky top-0 z-10 p-4 border-b dark:border-neutral-800'>
+        <form onSubmit={searchChats} className='relative'>
           <div className='relative'>
-            <div className='absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none'>
-              <i className='fa-solid fa-magnifying-glass'></i>
-            </div>
+            <FiSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 w-5 h-5' />
             <input
               type='text'
-              id='chat-search'
-              className='block w-full p-2 ps-10 pe-10 text-sm text-neutral-900 border border-neutral-300 rounded-lg bg-neutral-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-900 dark:border-neutral-600 dark:placeholder-neutral-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-              placeholder='Search'
+              className='w-full pl-10 pr-10 py-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-xl border-none focus:ring-2 focus:ring-violet-500 dark:text-white'
+              placeholder='Search conversations...'
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                if (e.target.value === '') fetchChats(); // Fetch chats when search is cleared
+                if (e.target.value === '') fetchChats();
               }}
               onKeyDown={handleKeyDown}
               autoComplete='off'
-              required
             />
             {searchQuery && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 type='button'
                 onClick={() => {
                   setSearchQuery('');
                   fetchChats();
                 }}
-                className='absolute inset-y-0 end-0 flex items-center w-fit pe-3'
+                className='absolute right-3 top-1/2 -translate-y-1/2'
               >
-                <i className='fa-solid fa-times'></i>
-              </button>
+                <FiX className='w-5 h-5 text-neutral-400 hover:text-neutral-600 dark:hover:text-white' />
+              </motion.button>
             )}
           </div>
         </form>
       </div>
+
+      {/* Chat List */}
       {isLoading ? (
         <div className='flex flex-grow items-center justify-center'>
           <Loader />
         </div>
       ) : (
-        <ul role='list' className='flex flex-col overflow-y-auto overflow-x-hidden w-full'>
-          {chats.map((chat: Chat) => (
-            <Link key={chat.id} href={`/chats/${chat.id}`} className='block w-full'>
-              <li className='flex items-center px-3 py-2 m-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-900 w-full'>
-                <div className='flex items-center space-x-3 flex-1 min-w-0 w-0'>
-                  <div className='flex-shrink-0 dark:bg-white rounded-full relative'>
-                    {!chat?.is_group ? (
-                      <>
-                        <img
-                          className='w-12 h-12 rounded-full border dark:border-neutral-500 border-neutral-200 object-cover'
-                          src={chat.participants.find((p) => p.id !== user.id)?.avatar || ''}
-                          alt={chat.participants.find((p) => p.id !== user.id)?.name}
-                        />
-                        <span className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-white rounded-full ${
-                          activeUsers.includes(chat.participants.find((p) => p.id !== user.id)?.id || 0)
-                            ? 'bg-green-400'
-                            : 'bg-neutral-400'
-                        }`}></span>
-                      </>
-                    ) : chat.group_icon ? (
-                      <img
-                        className='w-12 h-12 rounded-full border dark:border-neutral-500 border-neutral-200 object-cover'
-                        src={chat.group_icon || ''}
-                        alt='user photo'
-                        width={100}
-                        height={100}
-                      />
-                    ) : (
-                      <div className='flex items-center justify-center dark:text-black w-12 h-12 rounded-full border dark:border-neutral-500 border-neutral-200 object-cover'>
-                        <i className='fa-solid fa-people-group text-2xl'></i>
+        <motion.div initial={{ y: 20 }} animate={{ y: 0 }} className='flex-1 overflow-y-auto'>
+          <div className='p-2 space-y-1'>
+            {chats.map((chat: Chat) => (
+              <Link key={chat.id} href={`/chats/${chat.id}`}>
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  className='p-3 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all'
+                >
+                  <div className='flex items-center gap-4'>
+                    <div className='relative'>
+                      {!chat?.is_group ? (
+                        <>
+                          <div className='w-12 h-12 rounded-xl overflow-hidden'>
+                            <img
+                              className='w-full h-full object-cover rounded-[10px]'
+                              src={chat.participants.find((p) => p.id !== user.id)?.avatar}
+                              alt='avatar'
+                            />
+                          </div>
+                          {activeUsers.includes(chat.participants.find((p) => p.id !== user.id)?.id || 0) && (
+                            <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white dark:ring-neutral-900'></div>
+                          )}
+                        </>
+                      ) : (
+                        // <div className='w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-violet-500 to-purple-500 p-0.5'>
+                        <div className='w-12 h-12 rounded-xl overflow-hidden'>
+                          {chat.group_icon ? (
+                            <img className='w-full h-full object-cover rounded-[10px]' src={chat.group_icon} alt='group' />
+                          ) : (
+                            <div className='w-full h-full rounded-[10px] bg-white dark:bg-neutral-800 flex items-center justify-center'>
+                              <i className='fa-solid fa-people-group text-xl text-violet-500'></i>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-center justify-between'>
+                        <h3 className='font-medium dark:text-white truncate'>
+                          {chat.is_group ? chat.name : chat.participants.find((p) => p.id !== user.id)?.name}
+                        </h3>
+                        {chat.updated_time && (
+                          <span className='text-xs text-neutral-500 dark:text-neutral-400'>{getTime(chat.updated_time)}</span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <p className='text-sm font-semibold text-neutral-900 truncate dark:text-white'>
-                      {chat.is_group ? chat.name : chat.participants.find((p) => p.id !== user.id)?.name}
-                    </p>
-                    <span className='text-sm text-neutral-500 truncate dark:text-neutral-400'>
-                      {chat.last_message?.sender?.id === user.id
-                        ? 'You: '
-                        : chat.last_message?.sender
-                          ? `${chat.last_message.sender.name}: `
+                      <p className='text-sm text-neutral-500 dark:text-neutral-400 truncate'>
+                        {chat.last_message?.sender?.id === user.id
+                          ? 'You: '
+                          : chat.last_message?.sender
+                            ? `${chat.last_message.sender.name}: `
+                            : ''}
+                        {chat.last_message
+                          ? chat.last_message.type === 'txt'
+                            ? truncate({ chars: chat.last_message.content, length: 45 })
+                            : 'sent an attachment'
                           : ''}
-                      {chat.last_message
-                        ? chat.last_message.type === 'txt'
-                          ? truncate({ chars: chat.last_message.content, length: 45 })
-                          : 'sent an attachment'
-                        : ''}
-                    </span>
+                      </p>
+                    </div>
                   </div>
-                </div>
-                {chat.updated_time && (
-                  <div className='flex-shrink-0 ml-2'>
-                    <span className='inline-block bg-neutral-300 text-neutral-800 text-sm font-medium px-2.5 py-0.5 rounded-full dark:bg-neutral-900 dark:text-neutral-300'>
-                      {getTime(chat.updated_time)}
-                    </span>
-                  </div>
-                )}
-              </li>
-            </Link>
-          ))}
-        </ul>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

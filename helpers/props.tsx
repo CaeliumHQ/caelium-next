@@ -6,6 +6,7 @@ export interface Chat {
   participants: User[];
   updated_time: Date;
   last_message: LastMessage;
+  creator: number;
 }
 
 export interface LastMessage {

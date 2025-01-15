@@ -7,8 +7,8 @@ import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useContext, useEffect, useState, useMemo } from 'react';
 import AuthContext from './AuthContext';
-import { useChatsPaneContext } from './ChatsPaneContext';
 import { useWebSocket } from './SocketContext';
+import { useChatsPaneContext } from './ChatsPaneContext';
 
 interface childrenProps {
   chatId: number;
@@ -69,6 +69,7 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [typingMessage, setTypingMessage] = useState<{ typed: string; sender: number } | null>(null);
   const [nextPage, setNextPage] = useState<string | null>(null);
+  const [isSocketReady, setIsSocketReady] = useState(false);
   const [messageQueue, setMessageQueue] = useState<{ type: 'txt' | 'attachment'; content?: string }[]>([]);
 
   const api = useAxios();
@@ -113,13 +114,20 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
   }, [chatId, user]);
 
   useEffect(() => {
-    if (socket?.readyState === WebSocket.OPEN && messageQueue.length > 0) {
+    const socketIsReady = socket?.readyState === WebSocket.OPEN;
+    if (socketIsReady !== isSocketReady) {
+      setIsSocketReady(socketIsReady);
+    }
+  }, [socket?.readyState]);
+
+  useEffect(() => {
+    if (isSocketReady && messageQueue.length > 0) {
       messageQueue.forEach((msg) => {
         sendMessage(msg.type, msg.content);
       });
       setMessageQueue([]);
     }
-  }, [socket?.readyState, messageQueue]);
+  }, [isSocketReady, messageQueue]);
 
   const loadMoreMessages = async () => {
     if (!nextPage || isLoadingMore) return; // Prevent fetching if already at the last page or currently loading
@@ -324,4 +332,10 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
   );
 };
 
-export const useChatContext = () => useContext(ChatContext);
+export const useChatContext = () => {
+  const context = useContext(ChatContext);
+  if (context === undefined) {
+    console.error('useChatContext must be used within a ChatProvider');
+  }
+  return context;
+};

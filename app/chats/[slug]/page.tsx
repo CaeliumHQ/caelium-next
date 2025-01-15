@@ -1,21 +1,26 @@
 'use client';
-import Wrapper from '@/app/Wrapper';
-import { use, useEffect, useState } from 'react';
-// import NotificationPrompt from '@/components/base/NotificationPrompt';
-import ChatsPane from '@/components/chats/ChatsPane';
 import ChatHeader from '@/components/chats/elements/ChatHeader';
 import ChatInput from '@/components/chats/elements/ChatInput';
 import ChatMain from '@/components/chats/elements/ChatMain';
 import Loader from '@/components/Loader';
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext';
+import { useNavbar } from '@/contexts/NavContext';
 import { useWebSocket } from '@/contexts/SocketContext';
-// import useNotifications from '@/hooks/useNotifications';
+import { use, useEffect, useState } from 'react';
 
 const ChatPageContent = () => {
   const { isLoading } = useChatContext();
   const { isConnected } = useWebSocket();
   const [viewportHeight, setViewportHeight] = useState<number>(window.innerHeight);
   const [isMobile, setIsMobile] = useState(false);
+
+  const { setViewSM } = useNavbar();
+  useEffect(() => {
+    setViewSM(false);
+    return () => {
+      setViewSM(true);
+    };
+  }, [setViewSM]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -60,20 +65,11 @@ const ChatPageContent = () => {
 
 const Page = (props: { params: Promise<{ slug: number }> }) => {
   const params = use(props.params);
-  // const { showAlertDialog, requestPermission, setShowAlertDialog } = useNotifications();
 
   return (
-    <Wrapper navSM={false}>
-      {/* {showAlertDialog && <NotificationPrompt onEnable={requestPermission} onClose={() => setShowAlertDialog(false)} />} */}
-      <div className='flex flex-grow h-[calc(100dvh-5rem)] lg:divide-x divide-dashed divide-neutral-500 overflow-y-scroll'>
-        <div className='hidden lg:block flex-grow flex-none sm:w-1/4'>
-          <ChatsPane />
-        </div>
-        <ChatProvider chatId={params.slug}>
-          <ChatPageContent />
-        </ChatProvider>
-      </div>
-    </Wrapper>
+    <ChatProvider chatId={params.slug}>
+      <ChatPageContent />
+    </ChatProvider>
   );
 };
 

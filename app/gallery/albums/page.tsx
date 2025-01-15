@@ -1,5 +1,4 @@
 'use client';
-import Wrapper from '@/app/Wrapper';
 import Loader from '@/components/Loader';
 import { Album } from '@/helpers/props';
 import useAxios from '@/hooks/useAxios';
@@ -23,13 +22,13 @@ const Albums = () => {
   }, []);
 
   return loading ? (
-    <Wrapper>
+
       <div className='flex items-center justify-center h-[calc(100dvh-9rem)]'>
         <Loader />
       </div>
-    </Wrapper>
+
   ) : (
-    <Wrapper>
+
       <div className='p-4'>
         <div className='flex justify-between border-b px-10'>
           <p className='text-3xl w-1/2 font-bold p-1'>Albums</p>
@@ -60,7 +59,7 @@ const Albums = () => {
           ))}
         </div>
       </div>
-    </Wrapper>
+
   );
 };
 

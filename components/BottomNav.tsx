@@ -7,7 +7,7 @@ const BottomNav = () => {
       <div className='grid h-full max-w-lg grid-cols-5 mx-auto font-medium'>
         {options.map((option, id) => (
           <Link href={option.url} key={id} className='inline-flex text-xl flex-col items-center justify-center px-5 group'>
-            <i className={`fa-solid fa-${option.icon}`}></i>
+            <option.icon className='w-6 h-6' />
           </Link>
         ))}
       </div>

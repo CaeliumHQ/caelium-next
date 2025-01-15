@@ -1,5 +1,4 @@
 'use client';
-import Wrapper from '@/app/Wrapper';
 import { FormEvent, useState } from 'react';
 
 const CreateEvent = () => {
@@ -12,7 +11,6 @@ const CreateEvent = () => {
     e.preventDefault();
   };
   return (
-    <Wrapper>
       <div className='flex flex-col flex-grow items-center justify-center md:h-[calc(100dvh-5rem)] h-[calc(100dvh-9rem)]'>
         <div className='w-4/5 bg-neutral-900 p-8 rounded-md shadow-md'>
           <form onSubmit={handleSubmit}>
@@ -84,7 +82,6 @@ const CreateEvent = () => {
           </form>
         </div>
       </div>
-    </Wrapper>
   );
 };
 

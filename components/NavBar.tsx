@@ -1,74 +1,51 @@
 import { useNavbar } from '@/contexts/NavContext';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 const NavBar = () => {
   let { ctaButton, navLinks, dropDown } = useNavbar();
   return (
-    <nav className='bg-neutral-100 dark:bg-neutral-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600'>
-      <div className='max-w-screen-xl flex flex-wrap items-center h-20 justify-between mx-auto p-1'>
-        <Link href='/' className='flex  p-0 m-0 items-center space-x-3 rtl:space-x-reverse'>
-          <img
-            className='p-0 m-0 pointer-events-none dark:invert'
-            src={'/logos/written-dark.png'}
-            alt='caelium'
-            width={150}
-            height={0}
-          />
+    <motion.nav initial={{ y: -22, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className='fixed w-full z-20 top-0 start-0 md:px-6 md:py-4'>
+      <div className='max-w-screen-xl mx-auto flex items-center justify-between bg-white dark:bg-neutral-900 md:rounded-2xl shadow-sm px-6 py-3'>
+        <Link href='/' className='flex items-center space-x-3'>
+          <img className='pointer-events-none dark:invert' src='/logos/written-dark.png' alt='caelium' width={120} height={0} />
         </Link>
-        <div className='flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse'>
-          {ctaButton && (
-            <Link
-              href={ctaButton.url}
-              type='button'
-              className='flex items-center justify-center bg-blue-500 text-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-            >
-              {ctaButton.name}
-            </Link>
-          )}
-          <button
-            data-collapse-toggle='navbar-sticky'
-            type='button'
-            className='inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600'
-            aria-controls='navbar-sticky'
-            aria-expanded='false'
-          >
-            <span className='sr-only'>Open main menu</span>
-            <i className='fa-solid fa-bars text-xl'></i>
-          </button>
-        </div>
-        <div className='items-center dark:bg-neutral-900 bg-neutral-100 max-sm:w-screen justify-center hidden w-full md:flex md:w-auto' id='navbar-sticky'>
-          <ul className='flex flex-col p-4 md:p-0 mt-4 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0'>
+
+        <div className='flex items-center gap-6'>
+          <div className='hidden md:flex items-center gap-6'>
             {navLinks?.map((button, index) => (
-              <li key={index}>
-                <Link
-                  href={button.url}
-                  className={`block py-2 px-3 rounded md:bg-transparent ${button.active ? 'md:text-blue-700 md:dark:text-blue-500' : null} md:p-0`}
-                  aria-current='page'
-                >
-                  {button.name}
-                </Link>
-              </li>
+              <Link
+                key={index}
+                href={button.url}
+                className={`text-sm font-medium transition-colors ${
+                  button.active
+                    ? 'text-violet-500'
+                    : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                }`}
+              >
+                {button.name}
+              </Link>
             ))}
             {dropDown && (
-              <li>
+              <div className='relative'>
                 <button
                   id='dropdownNavbarLink'
                   data-dropdown-toggle='dropdownNavbar'
-                  className='flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-neutral-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-neutral-700 md:dark:hover:bg-transparent'
+                  className='flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
                 >
                   {dropDown.name}
-                  <i className='fa-solid fa-chevron-down px-1'></i>
+                  <i className='fa-solid fa-chevron-down text-xs'></i>
                 </button>
                 <div
                   id='dropdownNavbar'
-                  className='z-10 hidden font-normal bg-neutral-200 divide-y divide-gray-100 rounded-lg w-44 shadow-lg dark:bg-neutral-700 dark:divide-gray-600'
+                  className='z-10 hidden absolute top-full mt-2 w-48 bg-white dark:bg-neutral-800 rounded-xl shadow-lg'
                 >
-                  <ul className='py-2 text-sm text-gray-700 dark:text-gray-200' aria-labelledby='dropdownLargeButton'>
+                  <ul className='py-2'>
                     {dropDown.options.map((option, index) => (
                       <li key={index}>
                         <a
                           href={option.url}
-                          className='block px-4 py-2 hover:bg-neutral-300 dark:hover:bg-neutral-600 dark:hover:text-white'
+                          className='block px-4 py-2 text-sm text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-700'
                         >
                           {option.name}
                         </a>
@@ -76,12 +53,57 @@ const NavBar = () => {
                     ))}
                   </ul>
                 </div>
-              </li>
+              </div>
             )}
+          </div>
+
+          {ctaButton?.name !== 'Get Started' && ctaButton && (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href={ctaButton?.url}
+                className='bg-gradient-to-br from-violet-500 to-purple-500 text-white px-4 py-2 rounded-xl text-sm font-medium'
+              >
+                {ctaButton.name}
+              </Link>
+            </motion.div>
+          )}
+
+          <button
+            data-collapse-toggle='navbar-sticky'
+            type='button'
+            className='md:hidden p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+            aria-controls='navbar-sticky'
+            aria-expanded='false'
+          >
+            <span className='sr-only'>Open main menu</span>
+            <i className='fa-solid fa-bars text-xl'></i>
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className='hidden absolute top-full left-0 right-0 mt-4 mx-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg md:hidden'
+          id='navbar-sticky'
+        >
+          <ul className='py-4'>
+            {navLinks?.map((button, index) => (
+              <li key={index}>
+                <Link
+                  href={button.url}
+                  className={`block px-6 py-2 text-sm font-medium ${
+                    button.active
+                      ? 'text-violet-500'
+                      : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                  }`}
+                >
+                  {button.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

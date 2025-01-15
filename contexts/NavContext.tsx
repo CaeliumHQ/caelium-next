@@ -10,6 +10,10 @@ interface NavbarContextData {
   dropDown: { name: string; options: NavLink[] } | null;
   setDropDown: Dispatch<SetStateAction<{ name: string; options: NavLink[] } | null>>;
   defaultCtaButton: NavLink | null;
+  viewSM: boolean;
+  setViewSM: Dispatch<SetStateAction<boolean>>;
+  showNav: boolean;
+  setShowNav: Dispatch<SetStateAction<boolean>>;
 }
 
 const NavbarContext = createContext<NavbarContextData | undefined>(undefined);
@@ -42,8 +46,24 @@ export const NavbarProvider: React.FC<React.PropsWithChildren<{}>> = ({ children
   const [ctaButton, setCtaButton] = useState<NavLink | null>(defaultCtaButton);
   const [navLinks, setNavLinks] = useState<NavLink[] | null>(defaultNavLinks);
   const [dropDown, setDropDown] = useState<DropDown | null>(createDropdown);
+  const [viewSM, setViewSM] = useState<boolean>(true);
+  const [showNav, setShowNav] = useState<boolean>(true);
   return (
-    <NavbarContext.Provider value={{ ctaButton, setCtaButton, navLinks, setNavLinks, dropDown, setDropDown, defaultCtaButton }}>
+    <NavbarContext.Provider
+      value={{
+        ctaButton,
+        setCtaButton,
+        navLinks,
+        setNavLinks,
+        dropDown,
+        setDropDown,
+        defaultCtaButton,
+        viewSM,
+        setViewSM,
+        showNav,
+        setShowNav,
+      }}
+    >
       {children}
     </NavbarContext.Provider>
   );

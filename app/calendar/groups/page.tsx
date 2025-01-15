@@ -1,5 +1,3 @@
-import Wrapper from '@/app/Wrapper';
-
 const DateGroups = () => {
   interface DateObject {
     day: number;
@@ -41,26 +39,24 @@ const DateGroups = () => {
   ];
 
   return (
-    <Wrapper>
-      <div className='p-4 flex flex-col gap-4'>
-        {groups.map((group, i) => (
-          <div key={i} className='p-4 bg-neutral-900 rounded-3xl'>
-            <p className='text-4xl p-2 mb-5 border-b'>{group.title}</p>
-            <div className='grid grid-cols-2 items-center md:grid-cols-8 gap-4 mx-auto'>
-              {group.dates.map((date, i) => (
-                <div key={i} className='h-40 w-40 bg-neutral-800 rounded-lg flex flex-col items-center justify-center'>
-                  <p className='text-6xl'>{date.day}</p> <p className='text-xl'>{date.monthYear}</p>
-                </div>
-              ))}
-              <div className='h-40 w-40 bg-neutral-800 rounded-lg flex flex-col items-center justify-center'>
-                <i className='fa-solid fa-arrow-up-right-from-square text-3xl p-4 text-center text-neutral-500' />
-                <p className='text-neutral-400 text-xl'>view more</p>
+    <div className='p-4 flex flex-col gap-4'>
+      {groups.map((group, i) => (
+        <div key={i} className='p-4 bg-neutral-900 rounded-3xl'>
+          <p className='text-4xl p-2 mb-5 border-b'>{group.title}</p>
+          <div className='grid grid-cols-2 items-center md:grid-cols-8 gap-4 mx-auto'>
+            {group.dates.map((date, i) => (
+              <div key={i} className='h-40 w-40 bg-neutral-800 rounded-lg flex flex-col items-center justify-center'>
+                <p className='text-6xl'>{date.day}</p> <p className='text-xl'>{date.monthYear}</p>
               </div>
+            ))}
+            <div className='h-40 w-40 bg-neutral-800 rounded-lg flex flex-col items-center justify-center'>
+              <i className='fa-solid fa-arrow-up-right-from-square text-3xl p-4 text-center text-neutral-500' />
+              <p className='text-neutral-400 text-xl'>view more</p>
             </div>
           </div>
-        ))}
-      </div>
-    </Wrapper>
+        </div>
+      ))}
+    </div>
   );
 };
 

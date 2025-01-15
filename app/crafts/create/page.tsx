@@ -2,7 +2,6 @@
 import useAxios from '@/hooks/useAxios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Wrapper from '../../Wrapper';
 
 const CraftCreate = () => {
   const today = new Date();
@@ -51,66 +50,65 @@ const CraftCreate = () => {
   };
 
   return (
-    <Wrapper>
-      <div className='flex flex-col flex-grow items-center justify-center md:p-4 max-sm:min-h-[calc(100dvh-9rem)]'>
-        <div className='flex justify-center flex-col items-center sm:w-1/2'>
-          <div className='h-full p-8 rounded-lg shadow-md w-full max-sm:w-screen'>
-            <form onSubmit={handleSubmit}>
-              <h1 className='text-4xl font-bold mb-4 text-center'>
-                Craft <i className='fa-solid fa-feather ms-1'></i>
-              </h1>
+    <div className='flex flex-col flex-grow items-center justify-center md:p-4 max-sm:min-h-[calc(100dvh-9rem)]'>
+      <div className='flex justify-center flex-col items-center sm:w-1/2'>
+        <div className='h-full p-8 rounded-lg shadow-md w-full max-sm:w-screen'>
+          <form onSubmit={handleSubmit}>
+            <h1 className='text-4xl font-bold mb-4 text-center'>
+              Craft <i className='fa-solid fa-feather ms-1'></i>
+            </h1>
+            <input
+              value={title}
+              type='text'
+              className='input input-bordered w-full mb-4'
+              placeholder='Enter Title'
+              autoComplete='off'
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
+              autoFocus
+              required
+            />
+            <input
+              value={tag}
+              type='text'
+              className='input input-bordered w-full mb-4'
+              placeholder='Enter Tagline'
+              autoComplete='off'
+              onChange={(e) => {
+                setTag(e.target.value);
+              }}
+              required
+            />
+            <input
+              type='file'
+              accept='image/*'
+              onChange={handleBannerChange}
+              required
+              className='file-input mb-4 file-input-bordered w-full'
+            />
+            <textarea
+              className='textarea textarea-bordered w-full h-64 mb-4'
+              placeholder='Write your content here'
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+            />
+            <div className='mb-4'>
+              <label htmlFor='banner' className='block text-sm font-medium text-gray-700 dark:text-white'>
+                Date
+              </label>
               <input
-                value={title}
-                type='text'
-                className='input input-bordered w-full mb-4'
-                placeholder='Enter Title'
-                autoComplete='off'
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                }}
-                autoFocus
+                type='date'
+                className='mt-1 p-2 w-fit border rounded-md focus:outline-none focus:ring focus:border-blue-300 resize-none dark:bg-neutral-800 dark:border-neutral-700 dark:[color-scheme:dark]'
+                placeholder='Select date'
+                name='date'
+                value={selectedDate}
+                onChange={handleDateChange}
                 required
               />
-              <input
-                value={tag}
-                type='text'
-                className='input input-bordered w-full mb-4'
-                placeholder='Enter Tagline'
-                autoComplete='off'
-                onChange={(e) => {
-                  setTag(e.target.value);
-                }}
-                required
-              />
-              <input
-                type='file'
-                accept='image/*'
-                onChange={handleBannerChange}
-                required
-                className='file-input mb-4 file-input-bordered w-full'
-              />
-              <textarea
-                className='textarea textarea-bordered w-full h-64 mb-4'
-                placeholder='Write your content here'
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                required
-              />
-              <div className='mb-4'>
-                <label htmlFor='banner' className='block text-sm font-medium text-gray-700 dark:text-white'>
-                  Date
-                </label>
-                <input
-                  type='date'
-                  className='mt-1 p-2 w-fit border rounded-md focus:outline-none focus:ring focus:border-blue-300 resize-none dark:bg-neutral-800 dark:border-neutral-700 dark:[color-scheme:dark]'
-                  placeholder='Select date'
-                  name='date'
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  required
-                />
-              </div>
-              {/* <div className='mb-4'>
+            </div>
+            {/* <div className='mb-4'>
                 <label htmlFor='privacy' className='block text-sm font-medium text-gray-700 dark:text-white'>
                   Space
                 </label>
@@ -128,19 +126,18 @@ const CraftCreate = () => {
                   ))}
                 </div>
               </div> */}
-              <div className='flex justify-center'>
-                <button
-                  className='bg-blue-500 w-1/2 rounded-lg hover:bg-blue-600 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline'
-                  type='submit'
-                >
-                  Publish <i className='fa-solid fa-upload ms-1'></i>
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className='flex justify-center'>
+              <button
+                className='bg-blue-500 w-1/2 rounded-lg hover:bg-blue-600 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline'
+                type='submit'
+              >
+                Publish <i className='fa-solid fa-upload ms-1'></i>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    </Wrapper>
+    </div>
   );
 };
 

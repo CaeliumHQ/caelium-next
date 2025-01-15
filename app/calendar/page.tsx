@@ -2,10 +2,9 @@
 import { useNavbar } from '@/contexts/NavContext';
 import { NavLink } from '@/helpers/props';
 import { useEffect } from 'react';
-import Wrapper from '../Wrapper';
 
 const CalendarPage = () => {
-  const { navLinks, setNavLinks, setCtaButton, defaultCtaButton, } = useNavbar();
+  const { navLinks, setNavLinks, setCtaButton, defaultCtaButton } = useNavbar();
   useEffect(() => {
     setCtaButton({ name: 'Create Event', url: 'calendar/create' });
     const newLinks: NavLink[] = navLinks ? [...navLinks] : [];
@@ -17,14 +16,12 @@ const CalendarPage = () => {
   }, []);
 
   return (
-    <Wrapper>
-      <div className='p-4 grid place-items-center w-full'>
-        <div className='w-min'>
-          <h1 className='text-5xl'>Calendar</h1>
-          <p className='text-center'>Coming soon...</p>
-        </div>
+    <div className='p-4 grid place-items-center w-full'>
+      <div className='w-min'>
+        <h1 className='text-5xl'>Calendar</h1>
+        <p className='text-center'>Coming soon...</p>
       </div>
-    </Wrapper>
+    </div>
   );
 };
 

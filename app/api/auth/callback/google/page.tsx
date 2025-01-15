@@ -17,16 +17,27 @@ const Page = () => {
           },
           body: JSON.stringify({ code: auth_code }),
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new TypeError('Received non-JSON response');
+        }
+
         const data = await response.json();
         loginUser(data);
       } catch (error) {
-        console.error('Error fetching tokens:', error);
+        console.log('Error fetching tokens:', {
+          error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     };
     const auth_code = searchParams.get('code');
-    if (auth_code) {
-      fetch_tokens(auth_code);
-    }
+    auth_code && fetch_tokens(auth_code);
   }, [searchParams]);
   return (
     <div className='flex h-dvh items-center justify-center'>

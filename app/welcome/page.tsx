@@ -1,19 +1,28 @@
 'use client';
+import Loader from '@/components/Loader';
 import { Vortex } from '@/components/ui/vortex';
+import { useNavbar } from '@/contexts/NavContext';
 
 import { useEffect, useState } from 'react';
 
 const Page = () => {
   const [authURL, setAuthURL] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { setShowNav } = useNavbar();
   useEffect(() => {
+    setShowNav(false);
     const fetch_auth_url = async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/auth/google/auth_url/`);
       const data = await response.json();
       setAuthURL(data.url);
+      setIsLoading(false);
     };
     fetch_auth_url();
-  });
-  return (
+    return () => {
+      setShowNav(true);
+    };
+  }, []);
+  return !isLoading ? (
     <div className='flex flex-col items-center justify-center h-screen text-white'>
       <Vortex
         backgroundColor='black'
@@ -38,11 +47,17 @@ const Page = () => {
           </button>
         )}
         <div className='mt-4'>
-          <a href='/privacy-policy' className='text-sm text-gray-400 hover:text-gray-200 mr-4'>Privacy Policy</a>
-          <a href='/terms-and-conditions' className='text-sm text-gray-400 hover:text-gray-200'>Terms and Conditions</a>
+          <a href='/privacy-policy' className='text-sm text-gray-400 hover:text-gray-200 mr-4'>
+            Privacy Policy
+          </a>
+          <a href='/terms-and-conditions' className='text-sm text-gray-400 hover:text-gray-200'>
+            Terms and Conditions
+          </a>
         </div>
       </Vortex>
     </div>
+  ) : (
+    <Loader fullScreen />
   );
 };
 export default Page;

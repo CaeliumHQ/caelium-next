@@ -1,9 +1,10 @@
 'use client';
-import Wrapper from '@/app/Wrapper';
 import Loader from '@/components/Loader';
 import AuthContext from '@/contexts/AuthContext';
 import useAxios from '@/hooks/useAxios';
+import { motion } from 'framer-motion';
 import { useContext, useEffect, useRef, useState } from 'react';
+import { FiEdit2, FiLogOut, FiShare2, FiUser } from 'react-icons/fi';
 
 const Profile = () => {
   const api = useAxios();
@@ -113,109 +114,126 @@ const Profile = () => {
   };
 
   return user ? (
-    <Wrapper>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className='container mx-auto px-4 py-8'
+    >
       {alert && (
-        <div
-          className='p-4 m-4 text-sm text-center text-green-800 rounded-lg bg-green-50 dark:bg-neutral-800 dark:text-green-400'
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='p-4 mb-6 text-sm text-center text-green-800 rounded-xl bg-green-50 dark:bg-neutral-800/50 dark:text-green-400'
           role='alert'
         >
           <span className='font-medium'>Profile updated successfully.</span>
-        </div>
+        </motion.div>
       )}
-      <div className='flex flex-col items-center justify-center my-8 w-full min-h-[calc(100dvh-9rem)]'>
-        <div className='relative flex flex-col items-center justify-center'>
-          <img className='dark:bg-white h-64 w-64 rounded-full border object-cover' src={avatarSrc} alt='' />
-          <div>
+
+      <div className='max-w-4xl mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-sm p-8'>
+        <div className='relative flex flex-col items-center mb-8'>
+          <div className='relative'>
+            {avatarSrc ? (
+              <img className='h-32 w-32 rounded-full border object-cover' src={avatarSrc} alt={user.name} />
+            ) : (
+              <div className='h-32 w-32 rounded-full bg-gradient-to-br from-violet-500/10 to-purple-500/10 flex items-center justify-center'>
+                <FiUser className='w-16 h-16 text-violet-500' />
+              </div>
+            )}
+            <button
+              onClick={handleEditAvatarClick}
+              className='absolute bottom-0 right-0 bg-violet-500 p-2 rounded-full text-white hover:bg-violet-600 transition-colors'
+            >
+              <FiEdit2 className='w-4 h-4' />
+            </button>
             <input type='file' ref={fileInputRef} className='hidden' onChange={handleFileChange} />
           </div>
-          <button
-            onClick={handleEditAvatarClick}
-            className='absolute ml-44 mt-44 dark:bg-neutral-700 bg-neutral-300 p-2 rounded-full text-2xl fa-regular fa-pen-to-square'
-          />
+          <h1 className='text-2xl font-semibold mt-4 dark:text-white'>{user?.name}</h1>
+          
+          <div className='flex gap-3 mt-4'>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => {
+                if (editable) {
+                  updateProfile();
+                  setEditable(false);
+                } else {
+                  setEditable(true);
+                }
+              }}
+              className={`px-6 py-2 rounded-xl flex items-center gap-2 ${
+                editable 
+                  ? 'bg-gradient-to-br from-violet-500 to-purple-500 text-white' 
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-white'
+              }`}
+            >
+              <FiEdit2 className='w-4 h-4' />
+              {editable ? 'Save' : 'Edit'}
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              data-copy-to-clipboard-target='shareLink'
+              className='px-6 py-2 bg-neutral-100 dark:bg-neutral-700 rounded-xl flex items-center gap-2'
+            >
+              <FiShare2 className='w-4 h-4' />
+              Share
+            </motion.button>
+          </div>
         </div>
-        <h1 className='text-3xl mt-4'>{user?.name}</h1>
-        <div className='flex px-10 my-4 max-sm:w-full items-center justify-center'>
-          <button
-            onClick={() => {
-              if (editable) {
-                updateProfile();
-                setEditable(false);
-              } else {
-                setEditable(true);
-              }
-            }}
-            className={`p-1 rounded-lg max-sm:text-xl m-3 w-full md:w-24 ${editable ? 'dark:bg-blue-500 bg-blue-400' : 'dark:bg-neutral-700 bg-neutral-300'}`}
-          >
-            {editable ? 'Save' : 'Edit'}
-          </button>
-          <input
-            type='text'
-            id='shareLink'
-            value={`${process.env.NEXT_PUBLIC_DOM}/accounts/profile/${user?.id}`}
-            hidden
-            disabled
-            readOnly
-          />
-          <button
-            data-copy-to-clipboard-target='shareLink'
-            className='dark:bg-neutral-700 bg-neutral-300 p-1 rounded-lg max-sm:text-xl m-3 w-full md:w-24'
-          >
-            <span id='default-message'>Share</span>
-          </button>
-        </div>
-        <div className='md:w-3/5 w-full'>
+
+        <div className='space-y-6'>
           {fields.map((field, i) => (
-            <div className='px-4' key={i}>
-              {field.type != 'select' ? (
-                <label className='input input-bordered flex items-center gap-2 my-4 dark:[color-scheme:dark]'>
-                  {field.name}:
+            <div key={i}>
+              {field.type !== 'select' ? (
+                <div className='space-y-2'>
+                  <label className='text-sm text-neutral-500 dark:text-neutral-400'>{field.name}</label>
                   <input
                     type={field.type || 'text'}
-                    className='grow'
+                    className='w-full p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border-0'
                     value={field.value || ''}
                     placeholder={field.placeholder}
                     disabled={!editable}
                     onChange={(e) => handleInputChange(field.fieldName, field.name, e.target.value)}
                   />
-                  {errors[field.fieldName as keyof typeof errors] || !field.value ? (
-                    <i className='fa-solid fa-triangle-exclamation dark:text-red-400 text-red-500' />
-                  ) : null}
-                </label>
+                </div>
               ) : (
-                <select
-                  value={field.value || 'Other'}
-                  className='select select-bordered w-full mb-4'
-                  disabled={!editable}
-                  onChange={(e) => handleInputChange(field.fieldName, field.name, e.target.value)}
-                >
-                  <option disabled>{field.name}</option>
-                  {field.options?.map((option, i) => <option key={i}>{option}</option>)}
-                </select>
+                <div className='space-y-2'>
+                  <label className='text-sm text-neutral-500 dark:text-neutral-400'>{field.name}</label>
+                  <select
+                    value={field.value || 'Other'}
+                    className='w-full p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border-0'
+                    disabled={!editable}
+                    onChange={(e) => handleInputChange(field.fieldName, field.name, e.target.value)}
+                  >
+                    <option disabled>{field.name}</option>
+                    {field.options?.map((option, i) => <option key={i}>{option}</option>)}
+                  </select>
+                </div>
               )}
               {errors[field.fieldName as keyof typeof errors] && (
-                <p className='text-sm mx-4 text-red-600 dark:text-red-500 font-medium'>
+                <p className='text-sm text-red-500 mt-1'>
                   {(errors[field.fieldName as keyof typeof errors] as string[])[0]}
                 </p>
               )}
             </div>
           ))}
         </div>
-        <div className='flex flex-grow w-full align-middle justify-center'>
-          <button
-            onClick={logoutUser}
-            className='dark:bg-red-700 bg-red-500 h-12 text-white p-1 rounded-lg max-sm:text-xl mx-14 max-sm:w-full w-44'
-          >
-            <span id='default-message'>Logout</span>
-          </button>
-        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          onClick={logoutUser}
+          className='w-full mt-8 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl flex items-center gap-2 justify-center'
+        >
+          <FiLogOut className='w-5 h-5' />
+          Logout
+        </motion.button>
       </div>
-    </Wrapper>
+    </motion.div>
   ) : (
-    <Wrapper>
-      <div className='flex h-dvh items-center justify-center'>
-        <Loader />
-      </div>
-    </Wrapper>
+    <div className='flex h-screen items-center justify-center'>
+      <Loader />
+    </div>
   );
 };
 

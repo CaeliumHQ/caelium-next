@@ -1,5 +1,4 @@
 'use client';
-import Wrapper from '@/app/Wrapper';
 import { useState } from 'react';
 
 const CreateAlbum = () => {
@@ -25,51 +24,45 @@ const CreateAlbum = () => {
   ];
 
   return (
-    <Wrapper>
-      <div className='p-4'>
-        <div className='flex justify-center items-center'>
-          <input
-            type={'text'}
-            placeholder='Title'
-            className='border-b bg-neutral-950 outline-none text-6xl w-4/5 font-bold mb-4 p-1'
-          />
-          <button type='submit' className='bg-blue-600 mx-10 w-20 rounded-lg text-center h-10'>
-            Save
-          </button>
-        </div>
-        <div className='flex items-center justify-center sm:mt-16'>
-          <div className='bg-neutral-900 h-96 w-1/2 rounded-lg p-4'>
-            <div className='h-min grid grid-cols-4 md:grid-cols-6 gap-4 overflow-auto rounded-lg'>
-              {images.map((image, i) => (
-                <img
-                  key={i}
-                  className={`md:h-24 w-24 h-24 object-cover rounded-lg cursor-pointer ${selectedImages.includes(i) ? 'border-4 rounded-lg border-blue-500 object-cover' : ''}`}
-                  src={image}
-                  alt={`image-${i}`}
-                  onClick={() => toggleSelectImage(i)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className='flex items-center justify-center'>
-          <div className='flex w-1/2 justify-between mt-2 px-2'>
-            <p className='p-2'>{`selected images: ${selectedImages.length}`}</p>
-            {selectedImages.length != 0 ? (
-              <button
-                onClick={() => {
-                  setSelectedImages([]);
-                }}
-                className='px-4 py-1.5 bg-neutral-800 hover:border border-neutral-500 rounded-lg flex items-center justify-center'
-              >
-                <span className='fa-solid fa-xmark mr-2'></span>
-                <span>Clear</span>
-              </button>
-            ) : null}
+    <div className='p-4'>
+      <div className='flex justify-center items-center'>
+        <input type={'text'} placeholder='Title' className='border-b bg-neutral-950 outline-none text-6xl w-4/5 font-bold mb-4 p-1' />
+        <button type='submit' className='bg-blue-600 mx-10 w-20 rounded-lg text-center h-10'>
+          Save
+        </button>
+      </div>
+      <div className='flex items-center justify-center sm:mt-16'>
+        <div className='bg-neutral-900 h-96 w-1/2 rounded-lg p-4'>
+          <div className='h-min grid grid-cols-4 md:grid-cols-6 gap-4 overflow-auto rounded-lg'>
+            {images.map((image, i) => (
+              <img
+                key={i}
+                className={`md:h-24 w-24 h-24 object-cover rounded-lg cursor-pointer ${selectedImages.includes(i) ? 'border-4 rounded-lg border-blue-500 object-cover' : ''}`}
+                src={image}
+                alt={`image-${i}`}
+                onClick={() => toggleSelectImage(i)}
+              />
+            ))}
           </div>
         </div>
       </div>
-    </Wrapper>
+      <div className='flex items-center justify-center'>
+        <div className='flex w-1/2 justify-between mt-2 px-2'>
+          <p className='p-2'>{`selected images: ${selectedImages.length}`}</p>
+          {selectedImages.length != 0 ? (
+            <button
+              onClick={() => {
+                setSelectedImages([]);
+              }}
+              className='px-4 py-1.5 bg-neutral-800 hover:border border-neutral-500 rounded-lg flex items-center justify-center'
+            >
+              <span className='fa-solid fa-xmark mr-2'></span>
+              <span>Clear</span>
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 };
 

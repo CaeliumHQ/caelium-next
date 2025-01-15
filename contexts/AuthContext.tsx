@@ -1,8 +1,9 @@
 'use client';
+import Loader from '@/components/Loader';
 import { LastSeen, User } from '@/helpers/props';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
-import { ReactNode, Suspense, createContext, useEffect, useState } from 'react';
+import { ReactNode, createContext, useEffect, useState } from 'react';
 
 interface ErrorObject {
   [key: string]: string;
@@ -137,5 +138,5 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     updateLastSeen,
   };
 
-  return <AuthContext.Provider value={contextData}>{loading ? <Suspense /> : children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={contextData}>{loading ? <Loader fullScreen /> : children}</AuthContext.Provider>;
 };
