@@ -5,10 +5,10 @@ import useAxios from '@/hooks/useAxios';
 import { formatTimeSince } from '@/utils/timeUtils';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
-import { ReactNode, createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import AuthContext from './AuthContext';
-import { useWebSocket } from './SocketContext';
 import { useChatsPaneContext } from './ChatsPaneContext';
+import { useWebSocket } from './SocketContext';
 
 interface childrenProps {
   chatId: number;
@@ -202,19 +202,8 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
 
   const startCall = async (type: 'audio' | 'video') => {
     try {
-      const response = await api.post(`/api/chats/${chatId}/start_call/`, {
-        chat_id: chatId,
-        call_type: type,
-      });
-
-      if (response.data?.id) {
-        router.push(`/call/${chatId}`);
-      } else {
-        setError({
-          text: 'Failed to create call session',
-          code: 'CREATION_FAILED',
-        });
-      }
+      socket?.send(JSON.stringify({ category: 'call', chat_id: chatId, type, }));
+      router.push(`/call/${chatId}?type=${type}&role=caller`);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError({
@@ -288,7 +277,7 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
 
   const otherParticipant = useMemo(() => {
     if (!meta || meta.is_group) return null;
-    return meta.participants.find(participant => participant.id !== user.id) || null;
+    return meta.participants.find((participant) => participant.id !== user.id) || null;
   }, [meta]);
 
   if (error) {

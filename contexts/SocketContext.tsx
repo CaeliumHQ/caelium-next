@@ -12,13 +12,18 @@ interface WebSocketContextType {
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { setActiveUsers, addActiveUser, removeActiveUser, updateLastSeen, user } = useContext(AuthContext);
   const socketRef = useRef<WebSocket | null>(null);
   const [socketData, setSocketData] = useState<any>();
   const [isConnected, setIsConnected] = useState(false);
   const retryCountRef = useRef(0);
   const mounted = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const { setActiveUsers, addActiveUser, removeActiveUser, updateLastSeen } = useContext(AuthContext);
+
+  useEffect(() => {
+    const token = localStorage.getItem('authTokens');
+    setAuthToken(token);
+  }, []);
 
   useEffect(() => {
     if (!socketData) return;
@@ -36,30 +41,24 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     mounted.current = true;
-    const token = localStorage.getItem('authTokens');
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
+    if (!authToken) return;
 
     let reconnectTimeout: NodeJS.Timeout;
     const reconnectInterval = 500;
 
     const connectWebSocket = () => {
       console.log('Connecting to WebSocket');
-      setIsLoading(true);
 
       if (socketRef.current) {
         socketRef.current.onclose = null; // Remove previous onclose to prevent duplicate connections
         socketRef.current.close();
       }
 
-      const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_HOST}/ws/base/${JSON.parse(token).access}/`);
+      const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_HOST}/ws/base/${JSON.parse(authToken).access}/`);
 
       ws.onopen = () => {
         console.log('Connected to WebSocket');
         setIsConnected(true);
-        setIsLoading(false);
         retryCountRef.current = 0; // Reset retry counter on successful connection
       };
 
@@ -79,7 +78,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsConnected(false);
 
         retryCountRef.current += 1;
-        if (retryCountRef.current > 2 && user) {
+        if (retryCountRef.current > 2) {
           console.log('Maximum reconnection attempts reached. Reloading page...');
           window.location.reload();
           return;
@@ -99,7 +98,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     return () => {
       mounted.current = false;
-      setIsLoading(false);
       if (socketRef.current) {
         socketRef.current.onclose = null; // Prevent reconnect on component unmount
         socketRef.current.close();
@@ -108,7 +106,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         clearTimeout(reconnectTimeout);
       }
     };
-  }, []);
+  }, [authToken]);
 
   const send = (data: any) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -120,7 +118,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <WebSocketContext.Provider value={{ socket: socketRef.current, isConnected, send, socketData }}>
-      {user && isLoading ? <Loader fullScreen /> : children}
+      {!authToken ? children : socketRef.current && isConnected ? children : <Loader fullScreen />}
     </WebSocketContext.Provider>
   );
 };
