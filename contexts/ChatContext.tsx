@@ -208,7 +208,7 @@ export const ChatProvider = ({ chatId, children }: childrenProps) => {
       });
 
       if (response.data?.id) {
-        router.push(`/chats/call/${chatId}`);
+        router.push(`/call/${chatId}`);
       } else {
         setError({
           text: 'Failed to create call session',

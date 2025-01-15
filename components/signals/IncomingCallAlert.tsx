@@ -19,7 +19,7 @@ interface IncomingCallAlertProps {
 export function IncomingCallAlert({ isOpen, caller }: IncomingCallAlertProps) {
   const { clearIncomingCall } = useServices();
   const acceptCall = () => {
-    window.location.href = `/chats/call/${caller.chat_id}?type=${caller.callType}`;
+    window.location.href = `/call/${caller.chat_id}?type=${caller.callType}`;
   };
   return (
     <AlertDialog open={isOpen}>
