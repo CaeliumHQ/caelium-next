@@ -6,6 +6,7 @@ import { Chat } from '@/helpers/props';
 import { getTime, truncate } from '@/helpers/support';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 import Loader from '../Loader';
@@ -14,6 +15,7 @@ const ChatsPane = () => {
   const { authTokens, user, activeUsers } = useContext(AuthContext);
   const { socketData } = useWebSocket();
   const { chats, isLoading, searchQuery, setSearchQuery, fetchChats, searchChats, updateChatOrder } = useChatsPaneContext();
+  const pathname = usePathname();
 
   useEffect(() => {
     fetchChats();
@@ -81,67 +83,72 @@ const ChatsPane = () => {
       ) : (
         <motion.div initial={{ y: 20 }} animate={{ y: 0 }} className='flex-1 overflow-y-auto'>
           <div className='p-2 space-y-1'>
-            {chats.map((chat: Chat) => (
-              <Link key={chat.id} href={`/chats/${chat.id}`}>
-                <motion.div
-                  whileHover={{ scale: 1.01 }}
-                  className='p-3 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all'
-                >
-                  <div className='flex items-center gap-4'>
-                    <div className='relative'>
-                      {!chat?.is_group ? (
-                        <>
-                          <div className='w-12 h-12 rounded-xl overflow-hidden'>
-                            <img
-                              className='w-full h-full object-cover rounded-[10px]'
-                              src={chat.participants.find((p) => p.id !== user.id)?.avatar}
-                              alt='avatar'
-                            />
-                          </div>
-                          {activeUsers.includes(chat.participants.find((p) => p.id !== user.id)?.id || 0) && (
-                            <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white dark:ring-neutral-900'></div>
-                          )}
-                        </>
-                      ) : (
-                        // <div className='w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-violet-500 to-purple-500 p-0.5'>
-                        <div className='w-12 h-12 rounded-xl overflow-hidden'>
-                          {chat.group_icon ? (
-                            <img className='w-full h-full object-cover rounded-[10px]' src={chat.group_icon} alt='group' />
-                          ) : (
-                            <div className='w-full h-full rounded-[10px] bg-white dark:bg-neutral-800 flex items-center justify-center'>
-                              <i className='fa-solid fa-people-group text-xl text-violet-500'></i>
+            {chats.map((chat: Chat) => {
+              const isActive = pathname?.startsWith(`/chats/${chat.id}`);
+              return (
+                <Link key={chat.id} href={`/chats/${chat.id}`}>
+                  <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    className={`p-3 rounded-xl transition-all ${
+                      isActive ? 'bg-neutral-200 dark:bg-neutral-800' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <div className='flex items-center gap-4'>
+                      <div className='relative'>
+                        {!chat?.is_group ? (
+                          <>
+                            <div className='w-12 h-12 rounded-xl overflow-hidden'>
+                              <img
+                                className='w-full h-full object-cover rounded-[10px]'
+                                src={chat.participants.find((p) => p.id !== user.id)?.avatar}
+                                alt='avatar'
+                              />
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='flex-1 min-w-0'>
-                      <div className='flex items-center justify-between'>
-                        <h3 className='font-medium dark:text-white truncate'>
-                          {chat.is_group ? chat.name : chat.participants.find((p) => p.id !== user.id)?.name}
-                        </h3>
-                        {chat.updated_time && (
-                          <span className='text-xs text-neutral-500 dark:text-neutral-400'>{getTime(chat.updated_time)}</span>
+                            {activeUsers.includes(chat.participants.find((p) => p.id !== user.id)?.id || 0) && (
+                              <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white dark:ring-neutral-900'></div>
+                            )}
+                          </>
+                        ) : (
+                          // <div className='w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-violet-500 to-purple-500 p-0.5'>
+                          <div className='w-12 h-12 rounded-xl overflow-hidden'>
+                            {chat.group_icon ? (
+                              <img className='w-full h-full object-cover rounded-[10px]' src={chat.group_icon} alt='group' />
+                            ) : (
+                              <div className='w-full h-full rounded-[10px] bg-white dark:bg-neutral-800 flex items-center justify-center'>
+                                <i className='fa-solid fa-people-group text-xl text-violet-500'></i>
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
-                      <p className='text-sm text-neutral-500 dark:text-neutral-400 truncate'>
-                        {chat.last_message?.sender?.id === user.id
-                          ? 'You: '
-                          : chat.last_message?.sender
-                            ? `${chat.last_message.sender.name}: `
+
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex items-center justify-between'>
+                          <h3 className='font-medium dark:text-white truncate'>
+                            {chat.is_group ? chat.name : chat.participants.find((p) => p.id !== user.id)?.name}
+                          </h3>
+                          {chat.updated_time && (
+                            <span className='text-xs text-neutral-500 dark:text-neutral-400'>{getTime(chat.updated_time)}</span>
+                          )}
+                        </div>
+                        <p className='text-sm text-neutral-500 dark:text-neutral-400 truncate'>
+                          {chat.last_message?.sender?.id === user.id
+                            ? 'You: '
+                            : chat.last_message?.sender
+                              ? `${chat.last_message.sender.name}: `
+                              : ''}
+                          {chat.last_message
+                            ? chat.last_message.type === 'txt'
+                              ? truncate({ chars: chat.last_message.content, length: 45 })
+                              : 'sent an attachment'
                             : ''}
-                        {chat.last_message
-                          ? chat.last_message.type === 'txt'
-                            ? truncate({ chars: chat.last_message.content, length: 45 })
-                            : 'sent an attachment'
-                          : ''}
-                      </p>
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </Link>
-            ))}
+                  </motion.div>
+                </Link>
+              );
+            })}
           </div>
         </motion.div>
       )}
