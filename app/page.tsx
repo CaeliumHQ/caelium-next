@@ -1,5 +1,5 @@
 'use client';
-import Personal from '@/components/home/spaces/personal';
+import HomePageLayout from '@/components/home/spaces/HomePageLayout';
 import Loader from '@/components/layout/Loader';
 import AuthContext from '@/contexts/AuthContext';
 import { useContext } from 'react';
@@ -14,5 +14,9 @@ export default function Home() {
       </div>
     );
   }
-  return <Personal />;
+  return (
+    <main className='flex grow mt-6 md:px-6 md:gap-6 md:h-[calc(100vh-7rem)] overflow-hidden'>
+      <HomePageLayout />
+    </main>
+  );
 }
